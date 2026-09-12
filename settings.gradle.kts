@@ -1,0 +1,1 @@
+rootProject.name = "all-in-one-potion"

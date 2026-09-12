@@ -1,0 +1,7 @@
+name: AllInOnePotion
+version: 1.0.0
+main: com.kxald.allinonepotion.AllInOnePotionPlugin
+api-version: '1.21'
+description: Adds a craftable All-in-One Splash Potion (Strength II, Speed II, Fire Resistance, Weaving - 8 minutes each).
+author: kxald
+website: https://github.com/kxald
