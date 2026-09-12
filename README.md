@@ -32,6 +32,22 @@ Diamond Sword (empty)
 
 That's it — the result is a bright, aqua-colored **Omni Potion** you can throw or drink.
 
+## Configuration
+
+The Omni Potion recipe is fully customizable from `plugins/AllInOnePotion/config.yml`. You can change the grid layout and the materials used for the `N` and `S` markers (the `W` water bottle stays fixed):
+
+```yaml
+potion-recipe:
+  shape:
+    - "NW"
+    - "S "
+  ingredients:
+    N: NETHER_WART
+    S: DIAMOND_SWORD
+```
+
+All rows must be the same length (max 3). Invalid or missing rows fall back to the default recipe. Restart the server (or `/reload confirm`) after editing.
+
 ## Installation
 
 1. Build the plugin or download the jar.

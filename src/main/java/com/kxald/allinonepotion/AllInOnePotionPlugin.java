@@ -1,6 +1,9 @@
 package com.kxald.allinonepotion;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -29,30 +32,87 @@ public class AllInOnePotionPlugin extends JavaPlugin implements Listener {
     private static final int EIGHT_MINUTES = 8 * 60 * 20;
     private static final String OWNER = "imgsh";
 
+    private static final char N = 'N';
+    private static final char W = 'W';
+    private static final char S = 'S';
+    private static final String[] DEFAULT_SHAPE = {"NW", "S "};
+    private static final Material DEFAULT_N = Material.NETHER_WART;
+    private static final Material DEFAULT_S = Material.DIAMOND_SWORD;
+
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         registerRecipe();
         getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("All-in-One Splash Potion recipe registered.");
     }
 
     private void registerRecipe() {
+        String[] shape = buildShape();
+
         ShapedRecipe recipe = new ShapedRecipe(
                 new NamespacedKey(this, "all_in_one_splash"),
                 createPotion()
         );
 
-        recipe.shape(
-                "NW",
-                "S "
-        );
-
-        recipe.setIngredient('N', Material.NETHER_WART);
-        recipe.setIngredient('W', new RecipeChoice.ExactChoice(createWaterBottle()));
-        recipe.setIngredient('S', Material.DIAMOND_SWORD);
+        recipe.shape(shape);
         recipe.setGroup("all_in_one_potion");
 
+        Set<Character> chars = new HashSet<>();
+        for (String line : shape) {
+            for (char c : line.toCharArray()) {
+                chars.add(c);
+            }
+        }
+        for (char c : chars) {
+            if (c == ' ') continue;
+            RecipeChoice choice = ingredientFor(c);
+            if (choice != null) {
+                recipe.setIngredient(c, choice);
+            } else {
+                getLogger().warning("Unknown slot marker '" + c + "' in potion-recipe shape, ignoring it.");
+            }
+        }
+
         getServer().addRecipe(recipe);
+    }
+
+    private String[] buildShape() {
+        List<String> lines = getConfig().getStringList("potion-recipe.shape");
+        if (lines.isEmpty() || lines.size() > 3) return DEFAULT_SHAPE;
+
+        int width = lines.get(0).length();
+        for (String line : lines) {
+            if (line.length() != width || width < 1 || width > 3) return DEFAULT_SHAPE;
+            for (char c : line.toCharArray()) {
+                if (c != ' ' && c != N && c != W && c != S) return DEFAULT_SHAPE;
+            }
+        }
+        return lines.toArray(new String[0]);
+    }
+
+    private RecipeChoice ingredientFor(char c) {
+        String value = getConfig().getString("potion-recipe.ingredients." + c);
+        switch (c) {
+            case N -> {
+                return new RecipeChoice.MaterialChoice(materialFor(value, DEFAULT_N));
+            }
+            case W -> {
+                return new RecipeChoice.ExactChoice(createWaterBottle());
+            }
+            case S -> {
+                return new RecipeChoice.MaterialChoice(materialFor(value, DEFAULT_S));
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    private Material materialFor(String name, Material fallback) {
+        if (name == null) return fallback;
+        Material material = Material.matchMaterial(name);
+        return material != null ? material : fallback;
     }
 
     private ItemStack createPotion() {

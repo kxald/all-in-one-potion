@@ -1,0 +1,18 @@
+# Omni Potion crafting recipe.
+# Each row below is a line of the crafting grid, from top to bottom.
+# Slot markers:
+#   N = nether wart (material is configurable below)
+#   W = water bottle (fixed - exact filled water bottle)
+#   S = diamond sword (material is configurable below)
+#   ' ' = empty slot
+# The N and S materials can be changed to any material name
+# (e.g. IRON_INGOT, NETHERITE_SWORD). Invalid names fall back to the default.
+# All rows must be the same length and not longer than 3.
+
+potion-recipe:
+  shape:
+    - "NW"
+    - "S "
+  ingredients:
+    N: NETHER_WART
+    S: DIAMOND_SWORD
